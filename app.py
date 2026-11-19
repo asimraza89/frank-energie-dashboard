@@ -323,7 +323,15 @@ def highlights(hourly, prices, monthly, today) -> list[str]:
 def year_over_year(monthly) -> None:
     energies = [e for e in ("electricity", "gas", "feed_in") if e in set(monthly["energy"])]
     c1, c2 = st.columns(2)
-    energy = c1.radio("Energy", energies, format_func=ENERGY_LABEL.get, horizontal=True)
+
+    energy = c1.radio(
+        "Energy",
+        energies,
+        format_func=ENERGY_LABEL.get,
+        horizontal=True,
+        key="yoy_energy",
+    )
+
     metric = c2.radio("Show", ["usage", "costs"], format_func={"usage": "Consumption", "costs": "Cost"}.get, horizontal=True)
     table = an.yoy_table(monthly, energy, metric)
     if energy == "feed_in" and metric == "costs":
@@ -379,7 +387,15 @@ def patterns_tab(hourly, daily, today) -> None:
     if h.empty:
         st.info("No hourly data in this period.")
         return
-    energy = st.radio("Energy", [e for e in ("electricity", "gas") if e in set(h["energy"])], format_func=ENERGY_LABEL.get, horizontal=True)
+    
+    energy = st.radio(
+        "Energy",
+        [e for e in ("electricity", "gas") if e in set(h["energy"])],
+        format_func=ENERGY_LABEL.get,
+        horizontal=True,
+        key="patterns_energy",
+    )
+
     peaks = an.peak_hours(h, energy)
     st.markdown("Peak hours: " + ", ".join(f"**{r.hour_of_day:02d}:00–{r.hour_of_day + 1:02d}:00** ({r.usage:.2f} {UNIT[energy]})" for r in peaks.itertuples()))
     c1, c2 = st.columns([3, 2])
